@@ -1,8 +1,4 @@
-
 #include "ux.h"
-
-#include "ux.h"
-
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -12,6 +8,8 @@
 #include <chrono>
 #include <thread>
 #include <cstdlib>
+#include <limits>
+#include <algorithm>
 
 using std::cin;
 using std::cout;
@@ -22,19 +20,27 @@ using std::chrono::milliseconds;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
+const int WIDTH = 80;
+
 void LimpiarPantalla()
 {
-    system("clear");
+#if defined(_WIN32)
     system("cls");
-
+#else
+    system("clear");
+#endif
 }
 
 string center(const string &s, int width)
 {
-    int pad = (width - s.size()) / 2;
-    if (pad < 0)
-        pad = 0;
-    return string(pad, ' ') + s;
+    int len = s.length();
+    if (len >= width)
+        return s;
+
+    int left = (width - len) / 2;
+    int right = width - len - left;
+
+    return string(left, ' ') + s + string(right, ' ');
 }
 
 void mostrarASCII()
@@ -65,45 +71,40 @@ int interfaz()
         mostrarASCII();
 
         cout << "\033[35m";
-        cout << center("============================================\n");
-        cout << center("                MENU              \n");
-        cout << center("============================================\n\n");
+        cout << center("============================================") << "\n";
+        cout << center("                 MENU") << "\n";
+        cout << center("============================================") << "\n\n";
+
         cout << "\033[0m";
 
-        cout << "\033[33m";
-        cout << center("[1] Jugar\n");
-        cout << center("[2] Bromitas?\n");
-        cout << center("[3] Salir\n\n");
-        cout << "\033[0m";
+        cout << center("[1] Jugar") << "\n";
+        cout << center("[2] Bromitas?") << "\n";
+        cout << center("[3] Salir") << "\n\n";
 
         cout << center("⚠ Seleccione una opción: ");
 
-        // --- INICIO DE CORRECCIÓN ---
-        if (!(cin >> elec)) {
-            // Manejar error de entrada (no es un número)
+        if (!(cin >> elec))
+        {
             cin.clear();
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            elec = 0; // Forzar a que el bucle se repita
+            elec = 0;
         }
+
     } while (elec < 1 || elec > 3);
 
     return elec;
 }
 
-void loadingBarSalida()
-{
-    vector<string> mensajes{
-        "Guardando tus avances... (si es que hiciste alguno)",
-        "Desconectando la IA principal... ¡AY NO, ME ESTOY APAG-",
-        "Cerrando procesos ocultos... (no preguntes cuáles)",
-        "Liberando memoria RAM... (esa que te faltó todo el juego)",
-        "Apagando servidores... adiós a los trabajadores explotados",
-        "Desactivando modo gamer... vuelve a ser civil ahora",
-        "Calculando si realmente te quieres ir... confirmado",
-        "Cerrando shaders... estaban ocupados haciendo nada",
-        "Desinstalando bugs del sistema... (no se puede)",
-        "Cerrando sesión... ojalá no vuelvas por un crash"};
+template <typename T>
 
+string mensajeSeguro(const vector<T> &v, int progreso)
+{
+    int idx = std::min((int)(progreso / 10), (int)v.size() - 1);
+    return v[idx];
+}
+
+void loadingBar(const vector<string> &mensajes)
+{
     int progreso = 0;
 
     while (progreso <= 100)
@@ -111,19 +112,21 @@ void loadingBarSalida()
         LimpiarPantalla();
         mostrarASCII();
 
-        cout << center(mensajes[progreso / 10]) << "\n\n";
+        cout << "\n"
+             << center(mensajeSeguro(mensajes, progreso)) << "\n\n";
 
-        cout << center("[");
+        string bar = "[";
         for (int i = 0; i < 49; i++)
         {
             if (i < progreso / 2)
-                cout << "#";
+                bar += "\033[32m#\033[0m";
             else
-                cout << " ";
+                bar += " ";
         }
-        cout << "]\n";
+        bar += "]";
 
-        cout << center(std::to_string(progreso) + "%") << endl;
+        cout << center(bar) << "\n";
+        cout << center(std::to_string(progreso) + "%") << "\n";
 
         sleep_for(milliseconds(300 + (rand() % 200)));
 
@@ -131,6 +134,23 @@ void loadingBarSalida()
     }
 
     LimpiarPantalla();
+}
+
+void loadingBarSalida()
+{
+    vector<string> mensajes{
+        "Guardando tus avances... (si es que hiciste alguno)",
+        "Desconectando la IA principal... ¡AY NO, ME ESTOY APAG-",
+        "Cerrando procesos ocultos... (no preguntes cuales)",
+        "Liberando memoria RAM... (esa que te falto todo el juego)",
+        "Apagando servidores... adios a los trabajadores explotados",
+        "Desactivando modo gamer... vuelve a ser civil ahora",
+        "Calculando si realmente te quieres ir... confirmado",
+        "Cerrando shaders... estaban ocupados haciendo nada",
+        "Desinstalando bugs del sistema... (no se puede)",
+        "Cerrando sesion... ojala no vuelvas por un crash"};
+
+    loadingBar(mensajes);
 }
 
 void loadingBarEntrada()
@@ -142,44 +162,17 @@ void loadingBarEntrada()
         "Buscando bugs...",
         "Optimizando el juego...",
         "Aumentando FPS artificialmente...",
-        "Poniendo música épica...",
-        "Cargando físicas realistas...",
+        "Poniendo musica epica...",
+        "Cargando fisicas realistas...",
         "Cargando UI...",
         "A punto de terminar..."};
 
-    int progreso = 0;
-
-    while (progreso <= 100)
-    {
-        LimpiarPantalla();
-        mostrarASCII();
-
-        cout << center(mensajes[progreso / 10]) << "\n\n";
-
-        cout << center("[");
-        for (int i = 0; i < 49; i++)
-        {
-            if (i < progreso / 2)
-                cout << "#";
-            else
-                cout << " ";
-        }
-        cout << "]\n";
-
-        cout << center(std::to_string(progreso) + "%") << endl;
-
-        sleep_for(milliseconds(300 + (rand() % 200)));
-
-        progreso += 5;
-    }
-
-    LimpiarPantalla();
+    loadingBar(mensajes);
 }
 
 void entrada()
 {
     LimpiarPantalla();
-    sleep_for(milliseconds(100));
     loadingBarEntrada();
 }
 
@@ -188,7 +181,7 @@ void salida()
     LimpiarPantalla();
     cout << "\n\n";
     cout << "\033[1;32m" << center("Gracias por jugar.") << "\033[0m\n\n";
-    sleep_for(milliseconds(100));
+    sleep_for(milliseconds(150));
     loadingBarSalida();
 }
 
@@ -203,13 +196,10 @@ int runUXMenu()
         break;
 
     case 2:
-        // Bromas
         break;
 
     case 3:
         salida();
-        break;
-    default:
         break;
     }
 
