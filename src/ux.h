@@ -1,5 +1,3 @@
-
-
 #ifndef FINAL_PROYECT_PROGRAMMING_II_UX_H
 #define FINAL_PROYECT_PROGRAMMING_II_UX_H
 
@@ -20,5 +18,4 @@ void salida();
 
 int runUXMenu();
 
-
-#endif //FINAL_PROYECT_PROGRAMMING_II_UX_H
+#endif // FINAL_PROYECT_PROGRAMMING_II_UX_H
