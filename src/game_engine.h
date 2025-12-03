@@ -1,11 +1,13 @@
-
-
 #ifndef FINAL_PROYECT_PROGRAMMING_II_GAME_ENGINE_H
 #define FINAL_PROYECT_PROGRAMMING_II_GAME_ENGINE_H
 
 #include "map.h"
-#include "renderer.h"
-#include "config.h"
+
+//configuracion inicial
+static const int START_COMIDA = 18;
+static const int START_METAL = 12;
+static const int START_ENERGIA = 7;
+static const int MAX_PA = 2;
 
 class GameEngine
 {
