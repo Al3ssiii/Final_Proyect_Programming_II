@@ -7,13 +7,13 @@ include_directories(src)
 
 add_executable(Final_Proyect_Programming_II
         main.cpp
-        src/building.cpp
         src/controller.cpp
+        src/controller.h
         src/game_engine.cpp
+        src/game_engine.h
         src/map.cpp
-        src/renderer.cpp
-        src/tile.cpp
-        src/unit.cpp
+        src/map.h
         src/ux.cpp
+        src/ux.h
 )
 
