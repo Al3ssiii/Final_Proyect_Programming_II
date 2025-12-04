@@ -10,21 +10,6 @@ static const int MAX_PA = 2;
 
 class GameEngine
 {
-public:
-    GameEngine();
-
-    void render();
-
-    void player_move(int r, int c, int nr, int nc);
-    void recruit(int r, int c, UnitType ut);
-    void build(int r, int c, BuildingType bt);
-    void end_turn();
-
-    void request_quit();
-    bool quit_requested() const;
-    const Map& get_map() const { return map; }
-    Map& get_map() { return map; }
-
 private:
     Map map;
     ConsoleRenderer renderer;
@@ -39,8 +24,28 @@ private:
     void resolve_combat(int r, int c, int nr, int nc);
     void cpu_turn();
 
-    void check_win_conditions();
-    void try_capture_tile(int r, int c, Owner new_owner);
+public:
+    GameEngine();
+
+    void render();
+
+    // Jugador
+    void player_move(int r, int c, int nr, int nc);
+    void recruit(int r, int c, UnitType ut);
+    void build(int r, int c, BuildingType bt);
+    void end_turn();
+
+    // Control del juego
+    void request_quit();
+    bool quit_requested() const;
+    const Map &get_map() const
+    {
+        return map;
+    }
+    Map &get_map()
+    {
+        return map;
+    }
 };
 
 #endif
