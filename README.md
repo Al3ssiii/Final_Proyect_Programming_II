@@ -54,9 +54,9 @@ Implementamos una IA básica para que el juego sea un desafío:
 
   -  Ataca cualquier unidad del jugador que encuentre en su camino.
 
-   -  La lógica de la IA y el movimiento automático de sus unidades se gestionan en la fase de mundo del turno.
+   -  La lógica de la IA y el movimiento automatico de sus unidades se gestionan en la fase de mundo del turno.
 
-💻 Estructura del Código: Diseño Modular (POO)
+💻 Estructura del Codigo: Diseño Modular (POO)
 
 Uno de nuestros mayores enfoques fue la separación de responsabilidades. La arquitectura del proyecto está organizada en los siguientes módulos clave para garantizar el mantenimiento y la extensibilidad:
 
@@ -93,7 +93,7 @@ De esta manera podras ejecutar satisfactoriamente nuestro juego!.
 
 🧑‍💻 Créditos
 
- Este jeugo llamado *RIVAL FRONTIERS* fue realizado por:
+ Este juego llamado *RIVAL FRONTIERS* fue realizado por:
    -  Diego Godoy
    -  Bruno Zamora
    -  Alessio Tardillo
