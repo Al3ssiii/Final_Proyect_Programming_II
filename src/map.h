@@ -4,37 +4,25 @@
 #include <vector>
 #include <string>
 
-enum class Owner
-{
-    NONE,
-    J1,
-    J2,
-    NEUTRAL
+// Enum definitions
+enum class Owner { NONE, J1, J2, NEUTRAL };
+enum class UnitType { NONE_U, S, A, C, M, I };
+enum class BuildingType { NONE_B, CU, TO, GR };
+enum class TerrainType { LL, BO, MO, AG, PA };
+
+// Centralized Unit Stats
+struct UnitStats {
+    int hp;
+    int atk;
+    int def;
+    int move;
+    int cost_comida;
+    int cost_metal;
 };
-enum class UnitType
-{
-    NONE_U,
-    S,
-    A,
-    C,
-    M,
-    I
-};
-enum class BuildingType
-{
-    NONE_B,
-    CU,
-    TO,
-    GR
-};
-enum class TerrainType
-{
-    LL,
-    BO,
-    MO,
-    AG,
-    PA
-};
+
+// Helper to get stats based on type
+UnitStats get_unit_stats(UnitType t);
+std::string get_unit_name(UnitType t);
 
 class Tile
 {
@@ -71,7 +59,7 @@ public:
     void clearUnit();
     void clearBuilding();
 
-    std::string code() const; // e.g. "J1S/LL" or "..../AG"
+    std::string code() const;
 };
 
 class Map
@@ -102,14 +90,6 @@ public:
     void render(const Map &map, int turno, int pa, int comida, int metal, int energia);
 };
 
-
-struct Building
-{
-    BuildingType type;
-    Owner owner;
-    int level;
-    Building(BuildingType t = BuildingType::NONE_B, Owner o = Owner::NONE);
-    std::string to_string() const;
-};
+void generar_mapa_aleatorio(Map &map);
 
 #endif //FINAL_PROYECT_PROGRAMMING_II_MAP_H

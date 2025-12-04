@@ -3,7 +3,6 @@
 
 #include "map.h"
 
-//configuracion inicial
 static const int START_COMIDA = 18;
 static const int START_METAL = 12;
 static const int START_ENERGIA = 7;
@@ -14,18 +13,17 @@ class GameEngine
 public:
     GameEngine();
 
-    // UI
     void render();
 
-    // actions from controller
     void player_move(int r, int c, int nr, int nc);
     void recruit(int r, int c, UnitType ut);
     void build(int r, int c, BuildingType bt);
     void end_turn();
 
-    // control
     void request_quit();
     bool quit_requested() const;
+    const Map& get_map() const { return map; }
+    Map& get_map() { return map; }
 
 private:
     Map map;
@@ -36,11 +34,10 @@ private:
     int comida, metal, energia;
     bool quit_flag;
 
-    // helpers
     void world_phase();
     bool can_move_unit(int r, int c, int nr, int nc);
     void resolve_combat(int r, int c, int nr, int nc);
+    void cpu_turn();
 };
 
-
-#endif //FINAL_PROYECT_PROGRAMMING_II_GAME_ENGINE_H
+#endif
