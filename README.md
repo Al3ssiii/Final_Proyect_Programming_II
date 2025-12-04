@@ -88,10 +88,12 @@ make
 De esta manera podras ejecutar satisfactoriamente nuestro juego!.
 
 💡 Limitaciones
-Recordar que la IA es sumamente rustica, no esta implementado el *Pathfinding*, por ejemplo.
+
+ Recordar que la IA es sumamente rustica, no esta implementado el *Pathfinding*, por ejemplo.
 
 🧑‍💻 Créditos
-Este jeugo llamado *RIVAL FRONTIERS* fue realizado por:
+
+ Este jeugo llamado *RIVAL FRONTIERS* fue realizado por:
    -  Diego Godoy
    -  Bruno Zamora
    -  Alessio Tardillo
