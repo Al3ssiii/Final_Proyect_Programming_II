@@ -16,4 +16,14 @@ private:
     void process_line(const std::string &line);
 };
 
+struct UnitInfo
+{
+    UnitType type;
+    Owner owner;
+    UnitStats stats;
+
+    UnitInfo(UnitType t, Owner o);
+    std::string to_string() const;
+};
+
 #endif
