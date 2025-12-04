@@ -38,6 +38,9 @@ private:
     bool can_move_unit(int r, int c, int nr, int nc);
     void resolve_combat(int r, int c, int nr, int nc);
     void cpu_turn();
+
+    void check_win_conditions();
+    void try_capture_tile(int r, int c, Owner new_owner);
 };
 
 #endif
