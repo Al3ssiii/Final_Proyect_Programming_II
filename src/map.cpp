@@ -3,162 +3,235 @@
 #include <iomanip>
 #include <cstdlib>
 #include <ctime>
-#include <sstream>
 
-Unit* create_unit(UnitType t, Owner o) {
-    switch (t) {
-        case UnitType::S: return new Soldier(o);
-        case UnitType::A: return new Archer(o);
-        case UnitType::C: return new Knight(o);
-        case UnitType::M: return new Mage(o);
-        case UnitType::I: return new Engineer(o);
-        default: return nullptr;
+UnitStats get_unit_stats(UnitType t)
+{
+    switch (t)
+    {
+    case UnitType::S:
+        return {10, 2, 1, 2, 1, 1}; // HP, ATK, DEF, MOV, FOOD, METAL
+    case UnitType::A:
+        return {8, 3, 0, 2, 1, 2};
+    case UnitType::C:
+        return {12, 3, 2, 2, 2, 2};
+    case UnitType::M:
+        return {7, 4, 0, 2, 2, 1};
+    case UnitType::I:
+        return {9, 2, 1, 2, 1, 1};
+    default:
+        return {0, 0, 0, 0, 0, 0};
+    }
+}
+
+std::string get_unit_name(UnitType t)
+{
+    switch (t)
+    {
+    case UnitType::S:
+        return "Soldado";
+    case UnitType::A:
+        return "Arquero";
+    case UnitType::C:
+        return "Caballero";
+    case UnitType::M:
+        return "Mago";
+    case UnitType::I:
+        return "Ingeniero";
+    default:
+        return "Ninguno";
     }
 }
 
 Tile::Tile()
-        : terrain(TerrainType::LL),
-          owner(Owner::NONE),
-          unit_ptr(nullptr),
-          building(BuildingType::NONE_B),
-          building_owner(Owner::NONE)
-{}
+    : terrain(TerrainType::LL),
+      owner(Owner::NONE),
+      unit(UnitType::NONE_U),
+      unit_owner(Owner::NONE),
+      building(BuildingType::NONE_B),
+      building_owner(Owner::NONE) {}
 
-Tile::~Tile() {
-    clearUnit();
-}
+TerrainType Tile::getTerrain() const { return terrain; }
+void Tile::setTerrain(TerrainType t) { terrain = t; }
 
-void Tile::setUnit(Unit *u) {
-    clearUnit();
-    unit_ptr = u;
-}
+Owner Tile::getOwner() const { return owner; }
+void Tile::setOwner(Owner o) { owner = o; }
 
-void Tile::clearUnit() {
-    if (unit_ptr) {
-        delete unit_ptr;
-        unit_ptr = nullptr;
-    }
-}
+UnitType Tile::getUnit() const { return unit; }
+void Tile::setUnit(UnitType u) { unit = u; }
 
-Unit* Tile::releaseUnit() {
-    Unit* u = unit_ptr;
-    unit_ptr = nullptr;
-    return u;
-}
+Owner Tile::getUnitOwner() const { return unit_owner; }
+void Tile::setUnitOwner(Owner o) { unit_owner = o; }
 
-std::string get_terrain_code(TerrainType t) {
-    switch (t) {
-        case TerrainType::LL: return "LL";
-        case TerrainType::BO: return "BO";
-        case TerrainType::MO: return "MO";
-        case TerrainType::AG: return "AG";
-        case TerrainType::PA: return "PA";
-        default: return "??";
-    }
-}
+BuildingType Tile::getBuilding() const { return building; }
+void Tile::setBuilding(BuildingType b) { building = b; }
 
-std::string get_unit_code(UnitType t) {
-    switch (t) {
-        case UnitType::S: return "S";
-        case UnitType::A: return "A";
-        case UnitType::C: return "C";
-        case UnitType::M: return "M";
-        case UnitType::I: return "I";
-        default: return " ";
-    }
-}
+Owner Tile::getBuildingOwner() const { return building_owner; }
+void Tile::setBuildingOwner(Owner o) { building_owner = o; }
 
-std::string get_building_code(BuildingType b) {
-    switch (b) {
-        case BuildingType::CU: return "Cu";
-        case BuildingType::TO: return "To";
-        case BuildingType::GR: return "Gr";
-        default: return "  ";
-    }
-}
-
-std::string get_owner_code(Owner o) {
-    switch (o) {
-        case Owner::J1: return "1";
-        case Owner::J2: return "2";
-        case Owner::NEUTRAL: return "N";
-        default: return " ";
-    }
-}
-
-std::string Tile::code() const {
-    std::string s;
-
-    if (unit_ptr) {
-        s += get_unit_code(unit_ptr->get_type());
-        s += get_owner_code(unit_ptr->get_owner());
-    } else {
-        s += "  ";
-    }
-
-    if (building != BuildingType::NONE_B) {
-        s += get_building_code(building);
-        s += get_owner_code(building_owner);
-    } else {
-        s += get_terrain_code(terrain);
-    }
-
-    s += get_owner_code(owner);
-
-    return s;
-}
-
-Map::Map(int r, int c)
-    : rows(r), cols(c), data(r, std::vector<Tile>(c))
-{}
-
-bool Map::in_bounds(int r, int c) const {
-    return r >= 0 && r < rows && c >= 0 && c < cols;
-}
-
-Tile &Map::at(int r, int c) {
-    if (!in_bounds(r, c)) {
-        throw std::out_of_range("Map coordinates out of bounds");
-    }
-    return data[r][c];
-}
-
-const Tile &Map::at(int r, int c) const {
-    if (!in_bounds(r, c)) {
-        throw std::out_of_range("Map coordinates out of bounds");
-    }
-    return data[r][c];
-}
-
-int Map::num_rows() const {
-    return rows;
-}
-
-int Map::num_cols() const {
-    return cols;
-}
-
-void Map::set_terrain(int r, int c, TerrainType t) {
-    if (in_bounds(r, c)) {
-        data[r][c].setTerrain(t);
-    }
-}
-
-void ConsoleRenderer::render(const Map& map, int turno, int pa, int comida, int metal, int energia) const
+void Tile::clearUnit()
 {
+    unit = UnitType::NONE_U;
+    unit_owner = Owner::NONE;
+}
+void Tile::clearBuilding()
+{
+    building = BuildingType::NONE_B;
+    building_owner = Owner::NONE;
+}
+
+std::string Tile::code() const
+{
+    auto terr = [](TerrainType t)
+    {
+        switch (t)
+        {
+        case TerrainType::LL:
+            return "LL";
+        case TerrainType::BO:
+            return "BO";
+        case TerrainType::MO:
+            return "MO";
+        case TerrainType::AG:
+            return "AG";
+        case TerrainType::PA:
+            return "PA";
+        }
+        return "??";
+    }(terrain);
+
+    auto pref = [](Owner o)
+    {
+        switch (o)
+        {
+        case Owner::J1:
+            return "J1";
+        case Owner::J2:
+            return "J2";
+        case Owner::NEUTRAL:
+            return "Ne";
+        default:
+            return "..";
+        }
+    };
+
+    std::string owner_str = "..";
+    std::string unit_str = "";
+    std::string building_str = "";
+    std::string terrain_str = terr;
+
+    if (unit != UnitType::NONE_U)
+    {
+        owner_str = pref(unit_owner);
+        switch (unit)
+        {
+        case UnitType::S:
+            unit_str = "S";
+            break;
+        case UnitType::A:
+            unit_str = "A";
+            break;
+        case UnitType::C:
+            unit_str = "C";
+            break;
+        case UnitType::M:
+            unit_str = "M";
+            break;
+        case UnitType::I:
+            unit_str = "I";
+            break;
+        default:
+            unit_str = "?";
+            break;
+        }
+    }
+
+    if (building != BuildingType::NONE_B)
+    {
+        if (unit == UnitType::NONE_U)
+            owner_str = pref(building_owner);
+        switch (building)
+        {
+        case BuildingType::CU:
+            building_str = "Cu";
+            break;
+        case BuildingType::TO:
+            building_str = "To";
+            break;
+        case BuildingType::GR:
+            building_str = "Gr";
+            break;
+        default:
+            building_str = "??";
+            break;
+        }
+    }
+
+    if (!unit_str.empty() && !building_str.empty())
+    {
+        return owner_str + unit_str + "+" + building_str;
+    }
+    else if (!unit_str.empty())
+    {
+        return owner_str + unit_str + " " + terrain_str;
+    }
+    else if (!building_str.empty())
+    {
+        return owner_str + building_str + " " + terrain_str;
+    }
+    else
+    {
+        return " .." + std::string(" ") + terrain_str;
+    }
+}
+
+Map::Map(int r, int c) : rows(r), cols(c), data(r, std::vector<Tile>(c)) {}
+
+bool Map::in_bounds(int r, int c) const { return r >= 0 && c >= 0 && r < rows && c < cols; }
+Tile &Map::at(int r, int c) { return data[r][c]; }
+const Tile &Map::at(int r, int c) const { return data[r][c]; }
+const std::vector<std::vector<Tile>> &Map::grid() const { return data; }
+int Map::num_rows() const { return rows; }
+int Map::num_cols() const { return cols; }
+
+void Map::set_terrain_row(int row, TerrainType t)
+{
+    if (row < 0 || row >= rows)
+        return;
+    for (int c = 0; c < cols; ++c)
+        data[row][c].setTerrain(t);
+}
+
+void Map::clear()
+{
+    for (int r = 0; r < rows; ++r)
+        for (int c = 0; c < cols; ++c)
+            data[r][c] = Tile();
+}
+
+ConsoleRenderer::ConsoleRenderer() {}
+
+void ConsoleRenderer::render(const Map &map, int turno, int pa, int comida, int metal, int energia)
+{
+#if defined(_WIN32) || defined(_WIN64)
+    system("cls");
+#else
+    std::cout << "\x1B[2J\x1B[H";
+#endif
+
+    std::cout << "========================================================\n";
+    std::cout << " Turno: " << turno
+              << " | PA: " << pa
+              << " | Com: " << comida
+              << " | Met: " << metal
+              << " | Eng: " << energia << "\n";
+    std::cout << "========================================================\n";
+
     const int rows = map.num_rows();
     const int cols = map.num_cols();
 
-    std::cout << "\n--------------------------------------------------------\n";
-    std::cout << "Turno: " << turno << " | PA: " << pa;
-    std::cout << " | Comida: " << comida << " | Metal: " << metal << " | Energia: " << energia << "\n";
-    std::cout << "--------------------------------------------------------\n";
-
-    std::cout << "   ";
+    std::cout << "    ";
     for (int c = 0; c < cols; ++c)
-    {
-        std::cout << std::right << std::setw(8) << c;
-    }
+        std::cout << std::left << std::setw(8) << c;
     std::cout << "\n";
 
     for (int r = 0; r < rows; ++r)
@@ -166,7 +239,7 @@ void ConsoleRenderer::render(const Map& map, int turno, int pa, int comida, int 
         std::cout << std::right << std::setw(2) << r << "  ";
         for (int c = 0; c < cols; ++c)
         {
-            std::cout << std::left << std::setw(8) << map.at(r,c).code();
+            std::cout << std::left << std::setw(8) << map.at(r, c).code();
         }
         std::cout << "\n";
     }
@@ -176,23 +249,35 @@ void ConsoleRenderer::render(const Map& map, int turno, int pa, int comida, int 
     std::cout << "--------------------------------------------------------\n";
 }
 
-void generar_mapa_aleatorio(Map &map) {
+void generar_mapa_aleatorio(Map &map)
+{
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    for (int r = 0; r < map.num_rows(); ++r) {
-        for (int c = 0; c < map.num_cols(); ++c) {
+    for (int r = 0; r < map.num_rows(); ++r)
+    {
+        for (int c = 0; c < map.num_cols(); ++c)
+        {
             int rnd = std::rand() % 100;
-            if (rnd < 60) map.at(r, c).setTerrain(TerrainType::LL);
-            else if (rnd < 75) map.at(r, c).setTerrain(TerrainType::BO);
-            else if (rnd < 90) map.at(r, c).setTerrain(TerrainType::MO);
-            else map.at(r, c).setTerrain(TerrainType::AG);
+            if (rnd < 60)
+                map.at(r, c).setTerrain(TerrainType::LL);
+            else if (rnd < 75)
+                map.at(r, c).setTerrain(TerrainType::BO);
+            else if (rnd < 90)
+                map.at(r, c).setTerrain(TerrainType::MO);
+            else
+                map.at(r, c).setTerrain(TerrainType::AG);
         }
     }
 
+    // Bases
     map.at(0, 0).setBuilding(BuildingType::CU);
     map.at(0, 0).setBuildingOwner(Owner::J1);
-    map.at(11, 11).setBuilding(BuildingType::CU);
-    map.at(11, 11).setBuildingOwner(Owner::J2);
+    map.at(map.num_rows() - 1, map.num_cols() - 1).setBuilding(BuildingType::CU);
+    map.at(map.num_rows() - 1, map.num_cols() - 1).setBuildingOwner(Owner::J2);
 
-    map.at(11, 11).setUnit(create_unit(UnitType::S, Owner::J2));
+    // Initial Units
+    map.at(1, 0).setUnit(UnitType::S);
+    map.at(1, 0).setUnitOwner(Owner::J1);
+    map.at(map.num_rows() - 2, map.num_cols() - 1).setUnit(UnitType::S);
+    map.at(map.num_rows() - 2, map.num_cols() - 1).setUnitOwner(Owner::J2);
 }
